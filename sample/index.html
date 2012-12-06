@@ -1,0 +1,105 @@
+<html>
+<head>
+	<script type="text/javascript" src='../src/events/hrfm.events.js'></script>
+	<script type="text/javascript" src='../src/display/hrfm.display.js'></script>
+	<script type="text/javascript" src='ts/Sample.js'></script>
+	<script type="text/javascript" src='js/jquery-1.8.2.min.js'></script>
+	<script type="text/javascript">
+		$(function(){
+
+			var btn   = $('#btn'),
+				btn2  = $('#btn2'),
+				el    = $('#time'),
+				el2   = $('#random'),
+				rect  = $('#rect'),
+				cycle = new hrfm.events.Cycle();
+
+			var samples = [];
+			$('.rect2').each(function(){
+				samples.push( new Sample($(this)) );
+			});
+
+			cycle
+				.on('start',function(){
+					btn.html('stop');
+				})
+				.on('stop',function(){
+					btn.html('start');
+				})
+				.on('cycle',function(){
+					el.html(cycle.elapsedTime);
+				},this)
+				.on('cycle',function(){
+					el2.html(Math.random());
+				},this)
+				.on('cycle',function(){
+					el2.html(Math.random());
+				},this)
+				.on('cycle',function(){
+					rect.css('left', 100 + 100 * Math.cos( cycle.elapsedTime / 100 ) );
+				},this)
+			;
+
+			btn.click(function(){
+				if(cycle.running){
+					cycle.stop();
+				}else{
+					cycle.start();
+				}
+			});
+
+			btn2.click(function(){
+				for(var i=0; i < samples.length; i++){
+					if( i % 2 == 0 )
+					samples[i].destroy();
+				}
+			});
+
+		});
+	</script>
+	<style type="text/css">
+		.rect{
+			width: 100px;
+			height: 100px;
+			position: relative;
+			background: #000;
+		}
+	</style>
+</head>
+<body>
+	<div>
+		<button id='btn'></button>
+	<div>
+	<div id='state'></div>
+	<div id='time'></div>
+	<div id='random'></div>
+	<div id='rect' class='rect'></div>
+	<br/>
+	<br/>
+	<br/>
+	<div>
+		<button id='btn2'>destroy() even number</button>
+	<div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+	<div class='rect rect2'></div>
+</body>
+</html>
