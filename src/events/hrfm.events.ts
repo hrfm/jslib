@@ -7,6 +7,9 @@ module hrfm.events{
         e :(a) => IClosure;
     }
 
+    /**
+     * ClosureList で使われるクロージャ管理用のオブジェクト.
+     */
     export class Closure implements IClosure{
         // ------- MEMBER --------------------
         private static _ID:number = 0;
@@ -15,7 +18,7 @@ module hrfm.events{
         // scope
         private _s:Object;
         // priority
-        private _p:number;
+        priority:number;
         // indentity of this instance.
         id : number;
         // next
@@ -27,7 +30,7 @@ module hrfm.events{
             this.id = Closure._ID++;
             this._f = closure;
             this._s = scope;
-            this._p = priority;
+            this.priority = priority;
         }
         e(a = null):Closure{
             this._f.call( this._s, a );
@@ -38,6 +41,9 @@ module hrfm.events{
         }
     }
 
+    /**
+     * 関数を連続実行するための Function の Linked List.
+     */
     export class ClosureList{
 
         // ------- MEMBER --------------------
@@ -49,25 +55,47 @@ module hrfm.events{
 
         constructor(){}
 
+        /**
+         * Linked List に Closure を追加.
+         * @param closure
+         * @param scope
+         * @param priority
+         */
         add( closure:Function, scope:Object = undefined, priority:number = 0 ):number{
-            var c:Closure = this.head;
-            while(c){
-                if( c.eq( closure, scope ) ) return -1;
-                c = c.n;
-            }
-            c = new Closure( closure, scope, priority );
+            var c:Closure, n:Closure, t:Closure;
             if( !this.head ){
+                // そもそも存在しない場合は即追加.
+                c = new Closure( closure, scope, priority );
                 this.head = this.tail = c;
             }else{
-                this.tail.n = c;
-                c.p = this.tail;
-                this.tail = c;
+                // 重複を調べて追加.
+                c = this.head;
+                while(c){
+                    if( c.eq( closure, scope ) ) return -1;
+                    // priority で入れる場所を判断.
+                    if( c.priority <= priority ) t = c;
+                    c = c.n;
+                }
+                // 新規 Closure インスタンスを作成.
+                c = new Closure( closure, scope, priority );
+                if( t == this.tail ){
+                    t.n = c;
+                    c.p = t;
+                    this.tail = c;
+                }else{
+                    n   = t.n;
+                    t.n = c;
+                    c.p = t;
+                    c.n = n;
+                    n.p = c;
+                }
             }
             return c.id;
         }
 
         /**
-         * closure と scope からリスナを削除します.
+         * 指定した closure と scope の Closure を
+         * Linked List から削除します.
          * @param closure
          * @param scope
          */
@@ -84,7 +112,8 @@ module hrfm.events{
         }
 
         /**
-         * Closure ID を用いてリスナを削除します.
+         * 指定した ID の Closure を
+         * Linked List から削除します.
          * @param id
          */
         rmById( id:number ):void{
@@ -172,7 +201,7 @@ module hrfm.events{
          * @param closure
          * @param scope
          */
-        on( state:string, closure:Function, scope:Object = this ):EventDispatcher{
+        on( state:string, closure:Function, scope:Object = this, priority:number = 0 ):EventDispatcher{
             var i:number, s:string,
                 list:string[] = state.split(' '),
                 len:number = list.length;
@@ -181,7 +210,7 @@ module hrfm.events{
                 if( !this._hash_[s] ){
                     this._hash_[s] = new ClosureList();
                 }
-                this._hash_[s].add( closure, scope );
+                this._hash_[s].add( closure, scope, priority );
             }
             return this;
         }
@@ -194,11 +223,11 @@ module hrfm.events{
          * @param scope
          * @return
          */
-        onWithId( state:string, closure:Function, scope:Object = this ):number{
+        onWithId( state:string, closure:Function, scope:Object = this, priority:number = 0 ):number{
             if( !this._hash_[state] ){
                 this._hash_[state] = new ClosureList();
             }
-            return this._hash_[state].add( closure, scope );
+            return this._hash_[state].add( closure, scope, priority );
         }
 
         /**
@@ -238,7 +267,7 @@ module hrfm.events{
         execute( state:string, eventObject:Object = null ):void{
             if( this._hash_[state] ) this._hash_[state].exec(eventObject);
         }
-
+        
         /**
          * 全てのリスナを破棄します.
          * この動作は取り消しが出来ません.
@@ -249,7 +278,7 @@ module hrfm.events{
             }
             this._hash_ = [];
         }
-        
+
     }
 
     /**

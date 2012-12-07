@@ -7,7 +7,7 @@ module hrfm.events {
         static _ID;
         private _f;
         private _s;
-        private _p;
+        public priority: number;
         public id: number;
         public n: Closure;
         public p: Closure;
@@ -29,8 +29,8 @@ module hrfm.events {
     class EventDispatcher {
         public _hash_: ClosureList[];
         constructor ();
-        public on(state: string, closure: Function, scope?: Object): EventDispatcher;
-        public onWithId(state: string, closure: Function, scope?: Object): number;
+        public on(state: string, closure: Function, scope?: Object, priority?: number): EventDispatcher;
+        public onWithId(state: string, closure: Function, scope?: Object, priority?: number): number;
         public off(state: any, closure?: Function, scope?: Object): EventDispatcher;
         public execute(state: string, eventObject?: Object): void;
         public removeAllListeners(): void;

@@ -13,7 +13,7 @@ var hrfm;
                 this.id = Closure._ID++;
                 this._f = closure;
                 this._s = scope;
-                this._p = priority;
+                this.priority = priority;
             }
             Closure._ID = 0;
             Closure.prototype.e = function (a) {
@@ -34,20 +34,33 @@ var hrfm;
             ClosureList.prototype.add = function (closure, scope, priority) {
                 if (typeof scope === "undefined") { scope = undefined; }
                 if (typeof priority === "undefined") { priority = 0; }
-                var c = this.head;
-                while(c) {
-                    if(c.eq(closure, scope)) {
-                        return -1;
-                    }
-                    c = c.n;
-                }
-                c = new Closure(closure, scope, priority);
+                var c, n, t;
                 if(!this.head) {
+                    c = new Closure(closure, scope, priority);
                     this.head = this.tail = c;
                 } else {
-                    this.tail.n = c;
-                    c.p = this.tail;
-                    this.tail = c;
+                    c = this.head;
+                    while(c) {
+                        if(c.eq(closure, scope)) {
+                            return -1;
+                        }
+                        if(c.priority <= priority) {
+                            t = c;
+                        }
+                        c = c.n;
+                    }
+                    c = new Closure(closure, scope, priority);
+                    if(t == this.tail) {
+                        t.n = c;
+                        c.p = t;
+                        this.tail = c;
+                    } else {
+                        n = t.n;
+                        t.n = c;
+                        c.p = t;
+                        c.n = n;
+                        n.p = c;
+                    }
                 }
                 return c.id;
             };
@@ -121,24 +134,26 @@ var hrfm;
             function EventDispatcher() {
                 this._hash_ = [];
             }
-            EventDispatcher.prototype.on = function (state, closure, scope) {
+            EventDispatcher.prototype.on = function (state, closure, scope, priority) {
                 if (typeof scope === "undefined") { scope = this; }
+                if (typeof priority === "undefined") { priority = 0; }
                 var i, s, list = state.split(' '), len = list.length;
                 for(i = 0; i < len; i++) {
                     s = list[i];
                     if(!this._hash_[s]) {
                         this._hash_[s] = new ClosureList();
                     }
-                    this._hash_[s].add(closure, scope);
+                    this._hash_[s].add(closure, scope, priority);
                 }
                 return this;
             };
-            EventDispatcher.prototype.onWithId = function (state, closure, scope) {
+            EventDispatcher.prototype.onWithId = function (state, closure, scope, priority) {
                 if (typeof scope === "undefined") { scope = this; }
+                if (typeof priority === "undefined") { priority = 0; }
                 if(!this._hash_[state]) {
                     this._hash_[state] = new ClosureList();
                 }
-                return this._hash_[state].add(closure, scope);
+                return this._hash_[state].add(closure, scope, priority);
             };
             EventDispatcher.prototype.off = function (state, closure, scope) {
                 if (typeof closure === "undefined") { closure = undefined; }
