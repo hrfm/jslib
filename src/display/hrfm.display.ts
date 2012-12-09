@@ -23,6 +23,10 @@ module hrfm.display{
         private _ids    : number[];
         private _cycle  : hrfm.events.Cycle;
 
+        x : number;
+        y : number;
+        rotation : number;
+
         // ------- PUBLIC --------------------------------------------
 
         constructor( el:JQuery ){
@@ -36,6 +40,13 @@ module hrfm.display{
 
             this._ids   = [];
             this._cycle = Sprite._CYCLE;
+            this._cycle.on( 'cycle', this.__onCycle__, this, -1 );
+
+            // ---
+
+            this.x = 0;
+            this.y = 0;
+            this.rotation = 0;
 
         }
 
@@ -45,11 +56,11 @@ module hrfm.display{
          * @param closure
          * @param scope
          */
-        on( state:string, closure:Function, scope:Object = this ):hrfm.events.EventDispatcher{
+        on( state:string, closure:Function, scope:Object = this, priotiry:number = 0 ):hrfm.events.EventDispatcher{
             if( state == 'cycle' ){
-                this.onWithId( 'cycle', closure, scope );
+                this.onWithId( 'cycle', closure, scope, priotiry );
             }else{
-                super.on( state, closure, scope );
+                super.on( state, closure, scope, priotiry );
             }
             return this;
         }
@@ -62,13 +73,13 @@ module hrfm.display{
          * @param scope
          * @return
          */
-        onWithId( state:string, closure:Function, scope:Object = this ):number{
+        onWithId( state:string, closure:Function, scope:Object = this, priotiry:number = 0 ):number{
             if( state == 'cycle' ){
-                var id:number = this._cycle.onWithId( 'cycle', closure, scope );
+                var id:number = this._cycle.onWithId( 'cycle', closure, scope, priotiry );
                 if( 0 <= id ) this._ids.push( id );
                 return id;
             }else{
-                return super.onWithId( state, closure, scope );
+                return super.onWithId( state, closure, scope, priotiry );
             }
         }
 
@@ -113,8 +124,14 @@ module hrfm.display{
         /**
          * 毎フレーム実行される関数.
          */
-        private _onCycle(){
-            this.execute('enterframe');
+        private __onCycle__(){
+            /*
+            this.el.css({
+                left : this.x,
+                top  : this.y
+            });
+            */
+            this.el.css('transform','translate3d('+this.x+'px,'+this.y+'px, 0px) rotate('+this.rotation+'deg)');
         }
 
     }

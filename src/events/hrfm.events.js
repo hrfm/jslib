@@ -40,6 +40,7 @@ var hrfm;
                     this.head = this.tail = c;
                 } else {
                     c = this.head;
+                    t = this.head;
                     while(c) {
                         if(c.eq(closure, scope)) {
                             return -1;

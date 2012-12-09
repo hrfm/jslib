@@ -14,11 +14,6 @@
 				rect  = $('#rect'),
 				cycle = new hrfm.events.Cycle();
 
-			var samples = [];
-			$('.rect2').each(function(){
-				samples.push( new Sample($(this)) );
-			});
-
 			cycle
 				.on('start',function(){
 					btn.html('stop');
@@ -55,18 +50,33 @@
 				}
 			});
 
+			var stage = new Stage($('#stage'));
+			for( var i = 0; i < 2; i++ ){
+				var s = new Sample($("<div class='rect rect2'></div>"));
+				s.x = Math.random() * 500;
+				s.y = Math.random() * 500;
+				stage.addChild( s );
+			}
+
 		});
 	</script>
 	<style type="text/css">
+		*{
+			margin:0px;
+			padding:0px;
+		}
 		.rect{
 			width: 100px;
 			height: 100px;
-			position: relative;
-			background: #000;
+			margin-left:50px;
+			margin-top:50px;
+			position: absolute;
+			background: #ccc;
 		}
 	</style>
 </head>
 <body>
+	<!--
 	<div>
 		<button id='btn'></button>
 	<div>
@@ -80,26 +90,7 @@
 	<div>
 		<button id='btn2'>destroy() even number</button>
 	<div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
-	<div class='rect rect2'></div>
+	-->
+	<div id='stage' style='position:relative'></div>
 </body>
 </html>

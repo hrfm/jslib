@@ -25,27 +25,33 @@ var hrfm;
                 }
                 this._ids = [];
                 this._cycle = Sprite._CYCLE;
+                this._cycle.on('cycle', this.__onCycle__, this, -1);
+                this.x = 0;
+                this.y = 0;
+                this.rotation = 0;
             }
             Sprite._CYCLE = null;
-            Sprite.prototype.on = function (state, closure, scope) {
+            Sprite.prototype.on = function (state, closure, scope, priotiry) {
                 if (typeof scope === "undefined") { scope = this; }
+                if (typeof priotiry === "undefined") { priotiry = 0; }
                 if(state == 'cycle') {
-                    this.onWithId('cycle', closure, scope);
+                    this.onWithId('cycle', closure, scope, priotiry);
                 } else {
-                    _super.prototype.on.call(this, state, closure, scope);
+                    _super.prototype.on.call(this, state, closure, scope, priotiry);
                 }
                 return this;
             };
-            Sprite.prototype.onWithId = function (state, closure, scope) {
+            Sprite.prototype.onWithId = function (state, closure, scope, priotiry) {
                 if (typeof scope === "undefined") { scope = this; }
+                if (typeof priotiry === "undefined") { priotiry = 0; }
                 if(state == 'cycle') {
-                    var id = this._cycle.onWithId('cycle', closure, scope);
+                    var id = this._cycle.onWithId('cycle', closure, scope, priotiry);
                     if(0 <= id) {
                         this._ids.push(id);
                     }
                     return id;
                 } else {
-                    return _super.prototype.onWithId.call(this, state, closure, scope);
+                    return _super.prototype.onWithId.call(this, state, closure, scope, priotiry);
                 }
             };
             Sprite.prototype.off = function (state, closure, scope) {
@@ -67,8 +73,8 @@ var hrfm;
                 this.removeAllListeners();
                 this._cycle = null;
             };
-            Sprite.prototype._onCycle = function () {
-                this.execute('enterframe');
+            Sprite.prototype.__onCycle__ = function () {
+                this.el.css('transform', 'translate3d(' + this.x + 'px,' + this.y + 'px, 0px) rotate(' + this.rotation + 'deg)');
             };
             return Sprite;
         })(InteractiveObject);

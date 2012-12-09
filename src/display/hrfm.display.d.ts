@@ -9,12 +9,15 @@ module hrfm.display {
         static _CYCLE;
         private _ids;
         private _cycle;
+        public x: number;
+        public y: number;
+        public rotation: number;
         constructor (el: JQuery);
-        public on(state: string, closure: Function, scope?: Object): events.EventDispatcher;
-        public onWithId(state: string, closure: Function, scope?: Object): number;
+        public on(state: string, closure: Function, scope?: Object, priotiry?: number): events.EventDispatcher;
+        public onWithId(state: string, closure: Function, scope?: Object, priotiry?: number): number;
         public off(state: string, closure?: Function, scope?: Object): events.EventDispatcher;
         public destroy(): void;
-        private _onCycle();
+        private __onCycle__();
     }
     class MovieClip extends Sprite {
     }

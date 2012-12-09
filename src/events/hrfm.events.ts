@@ -70,6 +70,7 @@ module hrfm.events{
             }else{
                 // 重複を調べて追加.
                 c = this.head;
+                t = this.head;
                 while(c){
                     if( c.eq( closure, scope ) ) return -1;
                     // priority で入れる場所を判断.
@@ -200,6 +201,7 @@ module hrfm.events{
          * @param state
          * @param closure
          * @param scope
+         * @param priority
          */
         on( state:string, closure:Function, scope:Object = this, priority:number = 0 ):EventDispatcher{
             var i:number, s:string,
@@ -221,6 +223,7 @@ module hrfm.events{
          * @param state
          * @param closure
          * @param scope
+         * @param priority
          * @return
          */
         onWithId( state:string, closure:Function, scope:Object = this, priority:number = 0 ):number{
@@ -263,11 +266,12 @@ module hrfm.events{
         /**
          * 指定した state のイベントを発行します.
          * @param state
+         * @param eventObject
          */
         execute( state:string, eventObject:Object = null ):void{
             if( this._hash_[state] ) this._hash_[state].exec(eventObject);
         }
-        
+
         /**
          * 全てのリスナを破棄します.
          * この動作は取り消しが出来ません.
